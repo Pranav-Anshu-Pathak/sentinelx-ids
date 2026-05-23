@@ -36,7 +36,7 @@
 ### 1. Clone & setup
 
 ```bash
-git clone https://github.com/your-username/sentinelx-ids.git
+git clone https://github.com/pranav-anshu-pathak/sentinelx-ids.git
 cd sentinelx-ids
 ```
 

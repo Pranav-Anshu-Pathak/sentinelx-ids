@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "sentinelx-ids"
+version = "1.0.0"
+description = "SentinelX Intrusion Detection System"
+authors = ["SentinelX Team"]
+readme = "README.md"
+license = "MIT"
+packages = [
+    { include = "backend" },
+    { include = "websocket" },
+    { include = "collectors" },
+    { include = "alerts" },
+    { include = "detection_engine" },
+    { include = "parsers" },
+    { include = "ai_engine" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = { version = "^0.34.0", extras = ["standard"] }
+sqlalchemy = { version = "^2.0.0", extras = ["asyncio"] }
+aiosqlite = "^0.20.0"
+pydantic = "^2.10.0"
+pydantic-settings = "^2.7.0"
+python-jose = { version = "^3.3.0", extras = ["cryptography"] }
+passlib = { version = "^1.7.4", extras = ["bcrypt"] }
+python-multipart = "^0.0.18"
+websockets = "^14.0"
+httpx = "^0.28.0"
+pyyaml = "^6.0"
+python-dotenv = "^1.0.0"
+watchfiles = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.24.0"
+httpx = "^0.28.0"
+
+[tool.poetry.scripts]
+sentinelx = "backend.main:run"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

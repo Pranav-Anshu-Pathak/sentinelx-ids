@@ -1,0 +1,81 @@
+id: SX-1006
+name: Persistence Mechanism Detection
+description: >
+  Detects attempts to establish persistence on compromised systems through
+  crontab modification, systemd service creation, shell profile backdoors,
+  SSH authorized_keys manipulation, Windows registry run keys, and
+  scheduled task creation.
+author: SentinelX
+date: 2024-01-01
+severity: high
+category: Persistence
+mitre_technique: T1053
+mitre_tactic: Persistence
+log_source: any
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: 'crontab\s+-e'
+    - field: message
+      regex: 'crontab\s+-l'
+    - field: message
+      regex: 'echo\s+.*>>\s*/etc/cron'
+    - field: message
+      regex: 'echo\s+.*>>\s*/var/spool/cron'
+    - field: message
+      regex: '/etc/cron\.(d|daily|hourly|weekly|monthly)/'
+    - field: message
+      regex: 'systemctl\s+(enable|daemon-reload)'
+    - field: message
+      regex: 'cp\s+\S+\s+/etc/systemd/system/'
+    - field: message
+      regex: 'cat\s+.*>\s*/etc/systemd/system/\S+\.service'
+    - field: message
+      regex: '/lib/systemd/system/\S+\.service'
+    - field: message
+      regex: 'echo\s+.*>>\s*~/?\.(bashrc|bash_profile|profile|zshrc)'
+    - field: message
+      regex: 'echo\s+.*>>\s*/etc/profile(\.d/)?'
+    - field: message
+      regex: 'echo\s+.*>>\s*/home/\S+/\.(bashrc|profile)'
+    - field: message
+      regex: 'echo\s+.*>>\s*\S*\.authorized_keys'
+    - field: message
+      regex: 'echo\s+.*>>\s*/root/\.ssh/authorized_keys'
+    - field: message
+      regex: 'cp\s+.*authorized_keys'
+    - field: message
+      regex: 'ssh-copy-id'
+    - field: message
+      regex: '(?i)reg\s+add\s+.*\\Run\b'
+    - field: message
+      regex: '(?i)HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run'
+    - field: message
+      regex: '(?i)HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run'
+    - field: message
+      regex: '(?i)schtasks\s+/create'
+    - field: message
+      regex: '(?i)Register-ScheduledTask'
+    - field: message
+      regex: '(?i)New-ScheduledTaskTrigger'
+    - field: message
+      regex: '(?i)at\s+\d{2}:\d{2}\s+'
+    - field: message
+      regex: '/etc/init\.d/\S+'
+    - field: message
+      regex: '/etc/rc\.local'
+    - field: message
+      regex: '(?i)wmic\s+.*startup'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - persistence
+  - crontab
+  - systemd
+  - registry
+  - scheduled_task
+  - authorized_keys

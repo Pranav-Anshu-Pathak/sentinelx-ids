@@ -1,0 +1,69 @@
+id: SX-1007
+name: Port Scan Detection
+description: >
+  Detects port scanning activity including usage of nmap, masscan, and
+  other reconnaissance tools. Also detects scan signatures such as SYN,
+  FIN, XMAS, and NULL scans, as well as rapid sequential port connections.
+author: SentinelX
+date: 2024-01-01
+severity: medium
+category: Discovery
+mitre_technique: T1046
+mitre_tactic: Discovery
+log_source: any
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: '(?i)\bnmap\b'
+    - field: message
+      regex: '(?i)nmap\s+-s[STUFNXACW]'
+    - field: message
+      regex: '(?i)nmap\s+.*-sV'
+    - field: message
+      regex: '(?i)nmap\s+.*-O\b'
+    - field: message
+      regex: '(?i)nmap\s+.*-A\b'
+    - field: message
+      regex: '(?i)\bmasscan\b'
+    - field: message
+      regex: '(?i)masscan\s+.*-p'
+    - field: message
+      regex: '(?i)\bzmap\b'
+    - field: message
+      regex: '(?i)\brustscan\b'
+    - field: message
+      regex: 'SYN scan|syn[_\s]scan'
+    - field: message
+      regex: 'FIN scan|fin[_\s]scan'
+    - field: message
+      regex: 'XMAS scan|xmas[_\s]scan'
+    - field: message
+      regex: 'NULL scan|null[_\s]scan'
+    - field: message
+      regex: 'ACK scan|ack[_\s]scan'
+    - field: message
+      regex: 'TCP flags:\s*S[^A]'
+    - field: message
+      regex: 'TCP flags:\s*F[^I]'
+    - field: message
+      regex: 'TCP flags:\s*FPU'
+    - field: message
+      regex: 'connection refused.*port\s+\d+'
+    - field: message
+      regex: '(?i)version\s+detection|service\s+scan'
+    - field: message
+      regex: '(?i)unicornscan'
+    - field: message
+      regex: '(?i)hping[23]?\s+'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - port_scan
+  - reconnaissance
+  - discovery
+  - nmap
+  - network

@@ -1,0 +1,77 @@
+id: SX-1005
+name: Lateral Movement Detection
+description: >
+  Detects lateral movement techniques commonly used by attackers to move
+  across a network after initial compromise. Covers PsExec, WMI, SMB
+  authentication, RDP, WinRM, and popular pentesting tools.
+author: SentinelX
+date: 2024-01-01
+severity: high
+category: Lateral Movement
+mitre_technique: T1021
+mitre_tactic: Lateral Movement
+log_source: any
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: '(?i)psexec(\.exe|svc)?\s+'
+    - field: message
+      regex: '(?i)PSEXESVC'
+    - field: message
+      regex: '(?i)wmic\s+/node:'
+    - field: message
+      regex: '(?i)Invoke-WmiMethod'
+    - field: message
+      regex: '(?i)wmic\s+.*process\s+call\s+create'
+    - field: message
+      regex: '(?i)wmiprvse\.exe.*powershell'
+    - field: message
+      regex: 'NT_STATUS_LOGON_FAILURE.*SMB'
+    - field: message
+      regex: '(?i)smb.*authentication\s+fail'
+    - field: message
+      regex: '(?i)smbclient\s+//'
+    - field: message
+      regex: '(?i)smbmap\s+-'
+    - field: message
+      regex: '(?i)net\s+use\s+\\\\\S+'
+    - field: message
+      regex: '(?i)New-PSSession\s+-ComputerName'
+    - field: message
+      regex: '(?i)Enter-PSSession'
+    - field: message
+      regex: '(?i)Invoke-Command\s+-ComputerName'
+    - field: message
+      regex: '(?i)winrm\s+'
+    - field: message
+      regex: '(?i)evil-winrm'
+    - field: message
+      regex: '(?i)crackmapexec\s+'
+    - field: message
+      regex: '(?i)cme\s+(smb|winrm|ssh|ldap|mssql)\s+'
+    - field: message
+      regex: '(?i)impacket'
+    - field: message
+      regex: '(?i)wmiexec(\.py)?\s+'
+    - field: message
+      regex: '(?i)smbexec(\.py)?\s+'
+    - field: message
+      regex: '(?i)atexec(\.py)?\s+'
+    - field: message
+      regex: '(?i)dcomexec(\.py)?\s+'
+    - field: message
+      regex: '(?i)rdp.*from\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - lateral_movement
+  - psexec
+  - wmi
+  - smb
+  - rdp
+  - winrm
+  - network

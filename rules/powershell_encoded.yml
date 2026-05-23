@@ -1,0 +1,67 @@
+id: SX-1003
+name: Encoded or Obfuscated PowerShell Execution
+description: >
+  Detects encoded, obfuscated, or suspicious PowerShell execution patterns
+  commonly used by attackers to evade detection. Covers encoded commands,
+  hidden window execution, download cradles, and execution policy bypass.
+author: SentinelX
+date: 2024-01-01
+severity: high
+category: Execution
+mitre_technique: T1059.001
+mitre_tactic: Execution
+log_source: windows_event
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: '(?i)powershell.*-[Ee]ncoded[Cc]ommand\s+[A-Za-z0-9+/=]{20,}'
+    - field: message
+      regex: '(?i)powershell.*\s-[Ee][Nn]?[Cc]?\s+[A-Za-z0-9+/=]{20,}'
+    - field: message
+      regex: '(?i)powershell.*-[Ww]indow[Ss]tyle\s+[Hh]idden'
+    - field: message
+      regex: '(?i)powershell.*-[Ww]\s+[Hh]idden'
+    - field: message
+      regex: '(?i)\bIEX\s*\('
+    - field: message
+      regex: '(?i)Invoke-Expression'
+    - field: message
+      regex: '(?i)\.(downloadstring|downloadfile|downloaddata)\s*\('
+    - field: message
+      regex: '(?i)Net\.WebClient'
+    - field: message
+      regex: '(?i)New-Object\s+System\.Net\.WebClient'
+    - field: message
+      regex: '(?i)Invoke-WebRequest'
+    - field: message
+      regex: '(?i)Start-BitsTransfer'
+    - field: message
+      regex: '(?i)bypass\s+.*executionpolicy'
+    - field: message
+      regex: '(?i)-[Ee]xecutionpolicy\s+bypass'
+    - field: message
+      regex: '(?i)Set-ExecutionPolicy\s+Unrestricted'
+    - field: message
+      regex: '(?i)\[System\.Convert\]::FromBase64String'
+    - field: message
+      regex: '(?i)\[System\.Text\.Encoding\]::\S+\.GetString'
+    - field: message
+      regex: '(?i)Invoke-(Mimikatz|Shellcode|ReflectivePEInjection)'
+    - field: message
+      regex: '(?i)powershell.*-nop\s+-w\s+hidden'
+    - field: message
+      regex: '(?i)sal\s+a\s+New-Object;iex'
+    - field: message
+      regex: '(?i)\$env:\S+\s*\+\s*.*powershell'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - powershell
+  - encoded_command
+  - obfuscation
+  - execution
+  - windows

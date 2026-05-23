@@ -1,0 +1,68 @@
+id: SX-1002
+name: Reverse Shell Detection
+description: >
+  Detects common reverse shell patterns used by attackers to establish
+  a command-and-control channel back to their machine. Covers bash, netcat,
+  socat, Python, Perl, PHP, Ruby, and named-pipe based reverse shells.
+author: SentinelX
+date: 2024-01-01
+severity: critical
+category: Execution
+mitre_technique: T1059
+mitre_tactic: Execution
+log_source: syslog
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: '/dev/tcp/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d+'
+    - field: message
+      regex: 'bash\s+-i\s+>&?\s*/dev/tcp/'
+    - field: message
+      regex: 'bash\s+-i\s+>& /dev/(tcp|udp)/'
+    - field: message
+      regex: 'nc\s+(-e\s+/bin/(ba)?sh|-c\s+sh)'
+    - field: message
+      regex: 'ncat\s+.*(-e|--exec)\s+/bin/(ba)?sh'
+    - field: message
+      regex: 'socat\s+.*exec.*sh'
+    - field: message
+      regex: 'socat\s+TCP4?:.*EXEC:'
+    - field: message
+      regex: 'python[23]?\s+-c\s+.*import\s+socket'
+    - field: message
+      regex: 'python[23]?\s+-c\s+.*socket\.socket'
+    - field: message
+      regex: 'python[23]?\s+-c\s+.*subprocess\.call.*sh'
+    - field: message
+      regex: 'perl\s+-e\s+.*socket\s*\('
+    - field: message
+      regex: 'perl\s+-MIO::Socket'
+    - field: message
+      regex: 'php\s+-r\s+.*fsockopen\s*\('
+    - field: message
+      regex: 'php\s+-r\s+.*\$sock\s*=\s*fsockopen'
+    - field: message
+      regex: 'ruby\s+-rsocket\s+-e'
+    - field: message
+      regex: 'ruby\s+.*TCPSocket\.(new|open)'
+    - field: message
+      regex: 'mkfifo\s+\S+\s*&&?\s*(nc|ncat|bash)'
+    - field: message
+      regex: 'mkfifo\s+/tmp/\S+.*cat\s+/tmp/\S+\s*\|\s*/bin/(ba)?sh'
+    - field: message
+      regex: 'mknod\s+\S+\s+p\s*&&'
+    - field: message
+      regex: 'telnet\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+\d+\s*\|'
+    - field: message
+      regex: 'awk\s+.*BEGIN\s*\{.*"/inet/tcp/'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - reverse_shell
+  - execution
+  - command_and_control
+  - post_exploitation

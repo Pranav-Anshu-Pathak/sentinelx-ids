@@ -1,0 +1,70 @@
+id: SX-1004
+name: Privilege Escalation Attempt Detection
+description: >
+  Detects common privilege escalation techniques on Linux and Unix systems
+  including sudo abuse by low-privilege accounts, SUID bit manipulation,
+  direct access to sensitive credential files, and usage of privilege
+  escalation tools such as pkexec and doas.
+author: SentinelX
+date: 2024-01-01
+severity: high
+category: Privilege Escalation
+mitre_technique: T1548
+mitre_tactic: Privilege Escalation
+log_source: syslog
+detection:
+  condition: any
+  patterns:
+    - field: message
+      regex: 'sudo:\s+(www-data|nobody|apache|nginx|daemon|ftp)\s+:.*COMMAND=.*/bin/(ba)?sh'
+    - field: message
+      regex: 'sudo:\s+(www-data|nobody|apache|nginx|daemon|ftp)\s+:.*COMMAND=.*/bin/(da)?sh'
+    - field: message
+      regex: 'sudo:\s+\S+\s+:.*COMMAND=.*/bin/su\b'
+    - field: message
+      regex: 'sudo:\s+\S+\s+:.*COMMAND=.*python.*pty\.spawn'
+    - field: message
+      regex: 'chmod\s+[0-7]*[4-7][0-7]{2}\s+/|chmod\s+\+s\s+'
+    - field: message
+      regex: 'chmod\s+u\+s\s+'
+    - field: message
+      regex: 'chmod\s+4[0-7]{3}\s+'
+    - field: message
+      regex: 'cat\s+/etc/(passwd|shadow|sudoers)'
+    - field: message
+      regex: 'vi(m)?\s+/etc/(passwd|shadow|sudoers)'
+    - field: message
+      regex: 'nano\s+/etc/(passwd|shadow|sudoers)'
+    - field: message
+      regex: '\bsu\s+root\b'
+    - field: message
+      regex: '\bsu\s+-\s*$'
+    - field: message
+      regex: '\bsu\s+-\s+root\b'
+    - field: message
+      regex: '\bpkexec\b'
+    - field: message
+      regex: '\bdoas\s+'
+    - field: message
+      regex: 'CVE-2021-4034|PwnKit'
+    - field: message
+      regex: 'find\s+/\s+-perm\s+.*-type\s+f.*-exec'
+    - field: message
+      regex: 'find\s+.*-perm\s+-[46]000'
+    - field: message
+      regex: '\bcapsh\s+--'
+    - field: message
+      regex: 'python[23]?\s+-c\s+.*import\s+os;?\s*os\.(setuid|setgid)'
+    - field: message
+      regex: 'GTFOBins|LinPEAS|linpeas|linux-exploit-suggester'
+threshold:
+  count: 1
+  timeframe: 1
+  group_by: source_ip
+enabled: true
+tags:
+  - privilege_escalation
+  - sudo
+  - suid
+  - linux
+  - credential_access
